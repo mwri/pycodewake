@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import getpass
 import os
 import socket
 import sys
@@ -50,7 +51,7 @@ class Process(NoStore.Process, metaclass=Singleton):
 
         super().__init__(
             pid=os.getpid(),
-            username=os.getlogin(),
+            username=getpass.getuser(),
             fqdn=socket.getfqdn(),
             exe_path=exe_path or os.environ.get("_") or sys.argv[0],
         )
