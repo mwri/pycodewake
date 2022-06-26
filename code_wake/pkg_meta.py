@@ -7,7 +7,7 @@ name = "code-wake"
 version = "0.0.2"
 author = "Michael Wright"
 author_email = "mjw@methodanalysis.com"
-description = "Dictum repository"
+description = "Running code use instrumentation aid"
 url = "https://github.com/mwri/pycodewake"
 
 classifiers = [
