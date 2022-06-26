@@ -4,7 +4,7 @@ import sys
 from typing import Any, Dict
 
 name = "code-wake"
-version = "0.0.1"
+version = "0.0.2"
 author = "Michael Wright"
 author_email = "mjw@methodanalysis.com"
 description = "Dictum repository"
