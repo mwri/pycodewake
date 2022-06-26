@@ -1,0 +1,9 @@
+/.coverage
+/.vscode
+/build
+/dist
+/code_wake.egg-info/
+__pycache__/
+/venv
+/coverage.xml
+/.nox
