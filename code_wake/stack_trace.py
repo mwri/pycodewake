@@ -49,6 +49,17 @@ class Stacktrace:
         )
 
     @classmethod
+    def from_data(cls, data, st_len=None):
+        """
+        Return a stack trace from the data.
+
+        The data is as returned by the 'data' method, thus 'data' and 'from_date' may be used to serialise
+        and deserialise stack trace objects.
+        """
+
+        return cls([Stacktrace.Stackframe(*data_frame) for data_frame in (data if st_len is None else data[-st_len:])])
+
+    @classmethod
     def from_caller(cls, st_len=None, stacklevel=2):
         """
         Return a stack trace for the caller.
