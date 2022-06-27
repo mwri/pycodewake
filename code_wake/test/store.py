@@ -11,12 +11,11 @@ store_params - a two tuple (args and kwargs) providing the arguments for the sto
 
 
 import pytest
-
 from code_wake import Process
 
 
 def test_constructor_returns_obj(store_cls, store_params):
-    (args, kwargs) = store_params
+    (args, kwargs) = store_params() if callable(store_params) else store_params
     assert isinstance(store_cls(*args, **kwargs), store_cls)
 
 
