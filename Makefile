@@ -28,7 +28,7 @@ dev_deps: venv/lib/.dev_deps
 venv/lib/.dev_deps: venv/lib/.deps venv/bin/activate $(pkg_meta_src)
 	. venv/bin/activate \
 		&& pip install $$(python3 $(pkg_meta_src) extras_require dev) \
-		&& pip install --no-deps code-wake-sql14-store
+		&& pip install --no-deps code-wake-sql14-store code-wake-v1rest-store code-wake-v1wsgi-service
 	touch venv/lib/.dev_deps
 
 .PHONY: test
