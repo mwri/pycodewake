@@ -9,8 +9,8 @@ from code_wake.abstract_store import AbstractStore
 from code_wake.test.conftest import *
 
 ptparam_stores = pytest.mark.parametrize(
-    "store_cls,store_params",
+    "store_cls,store_params,store_cleanup",
     [
-        (Sql14Store, (["sqlite:///:memory:"], {})),
+        (Sql14Store, (["sqlite:///:memory:"], {}), lambda _store: None),
     ],
 )

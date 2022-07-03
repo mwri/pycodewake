@@ -17,9 +17,11 @@ import pytest
 from code_wake import Process
 
 
-def test_constructor_returns_obj(store_cls, store_params):
+def test_constructor_returns_obj(store_cls, store_params, store_cleanup):
     (args, kwargs) = store_params() if callable(store_params) else store_params
-    assert isinstance(store_cls(*args, **kwargs), store_cls)
+    store = store_cls(*args, **kwargs)
+    assert isinstance(store, store_cls)
+    store_cleanup(store)
 
 
 def test_insert_process_no_env_name_inserts_process_without_env(store):
@@ -130,14 +132,14 @@ def test_logged_event_like_stacktraces_not_duplicated_if_same(store, process):
     event2 = bat(1)
     st2 = event2.stacktrace
 
-    assert st1.id == st2.id
+    assert st1.id == st2.id, (st1.id, st2.id)
 
     event3 = bat(2)
     st3 = event3.stacktrace
     event4 = bat(2)
     st4 = event4.stacktrace
 
-    assert st3.id != st4.id
+    assert st3.id != st4.id, (st3.id, st4.id)
 
 
 def test_logged_exc_event_like_stacktraces_not_duplicated_if_same(store, process, exc):

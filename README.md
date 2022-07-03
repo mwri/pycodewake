@@ -114,6 +114,29 @@ cwproc = code_wake.Process(
 Also `st_for_non_exceptions` will override the recording of stack traces for non exception
 events and `st_from_exceptions` for exception events.
 
+## Queue store
+
+A "queue store" which can be mixed in with another store, can be used to turn any
+store into one which always queues, instead of immediately adding the event. This
+means that a process may be protected from being adversely affected by high latency
+or unreliable stores. The events are processed by another thread, which commits them
+to whatever actual storage you are using.
+
+For example:
+
+```python
+from code_wake import QueueStore
+from code_wake_sql14_store import Sql14Store
+
+class Sql14QueueStore(QueueStore, Sql14Store):
+    pass
+
+store = Sql14QueueStore("sqlite:////tmp/some_file.sqlite")
+```
+
+The store adapter used with the queue store must be thread safe and cross thread operable.
+Sqlite for example, does not work cross threads when used with memory backing!
+
 ## Environment variables
 
 Apart from `CODE_WAKE_CONFIG` to set the config, the following are supported
