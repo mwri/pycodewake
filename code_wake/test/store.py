@@ -76,13 +76,23 @@ def test_insert_process_with_app_vsn_inserts_process_with_app_vsn(store):
     assert loaded_process.app_vsn.vsn == "1.2.3"
 
 
-def test_insert_event_returns_event(store, process):
+def test_insert_event_returns_none_by_default(store, process):
     event = store.insert_event(process)
+    assert event is None
+
+
+def test_insert_event_returns_none_if_sync_false(store, process):
+    event = store.insert_event(process, sync=False)
+    assert event is None
+
+
+def test_insert_event_returns_event_if_sync_true(store, process):
+    event = store.insert_event(process, sync=True)
     assert isinstance(event, store.Event)
 
 
 def test_logged_event_has_logged_data(store, process):
-    event = store.insert_event(process, data=(("foo1", "foo1bar"), ("bar2", "bar2baz")))
+    event = store.insert_event(process, data=(("foo1", "foo1bar"), ("bar2", "bar2baz")), sync=True)
     assert len(event.data) == 2
     loaded_data = [{r.key: r.val} for r in event.data]
     assert {"foo1": "foo1bar"} in loaded_data
@@ -90,18 +100,18 @@ def test_logged_event_has_logged_data(store, process):
 
 
 def test_logged_event_has_no_stacktrace_by_default(store, process):
-    event = store.insert_event(process)
+    event = store.insert_event(process, sync=True)
     assert event.stacktrace is None
 
 
 def test_logged_event_has_stacktrace_if_requested(store, process):
-    event = store.insert_event(process, inc_st=True)
+    event = store.insert_event(process, inc_st=True, sync=True)
     assert event.stacktrace is not None
 
 
 def test_logged_event_like_stacktraces_not_duplicated_if_same(store, process):
     def bat(st_len):
-        return store.insert_event(process, inc_st=True, st_len=st_len)
+        return store.insert_event(process, inc_st=True, st_len=st_len, sync=True)
 
     event1 = bat(1)
     st1 = event1.stacktrace
@@ -119,9 +129,9 @@ def test_logged_event_like_stacktraces_not_duplicated_if_same(store, process):
 
 
 def test_logged_exc_event_like_stacktraces_not_duplicated_if_same(store, process, exc):
-    event1 = store.insert_event(process, exc=exc)
+    event1 = store.insert_event(process, exc=exc, sync=True)
     st1 = event1.stacktrace
-    event2 = store.insert_event(process, exc=exc)
+    event2 = store.insert_event(process, exc=exc, sync=True)
     st2 = event2.stacktrace
 
     assert st1.id == st2.id
@@ -133,7 +143,7 @@ def test_logged_exc_event_like_stacktraces_not_duplicated_if_same(store, process
         exc2 = err
     assert isinstance(exc2, Exception)
 
-    event3 = store.insert_event(process, exc=exc2)
+    event3 = store.insert_event(process, exc=exc2, sync=True)
     st3 = event3.stacktrace
 
     assert st1.id != st3.id
@@ -147,13 +157,13 @@ def test_logged_event_stacktrace_frames_as_expected(store, process):
         return baz()
 
     def baz():
-        return store.insert_event(process, inc_st=True)
+        return store.insert_event(process, inc_st=True, sync=True)
 
     event = foo()
 
     assert event.stacktrace.stackframes[0].filename.endswith(".py")
     assert isinstance(event.stacktrace.stackframes[0].lineno, int)
-    assert event.stacktrace.stackframes[0].src == "return store.insert_event(process, inc_st=True)"
+    assert event.stacktrace.stackframes[0].src == "return store.insert_event(process, inc_st=True, sync=True)"
 
     assert event.stacktrace.stackframes[1].filename.endswith(".py")
     assert isinstance(event.stacktrace.stackframes[1].lineno, int)
@@ -169,12 +179,12 @@ def test_logged_event_stacktrace_frames_as_expected(store, process):
 
 
 def test_logged_exc_event_has_stacktrace_by_default(store, process, exc):
-    event = store.insert_event(process, exc=exc)
+    event = store.insert_event(process, exc=exc, sync=True)
     assert event.stacktrace is not None
 
 
 def test_logged_exc_event_stacktrace_frames_as_expected(store, process, exc):
-    event = store.insert_event(process, exc=exc)
+    event = store.insert_event(process, exc=exc, sync=True)
     assert event.stacktrace is not None
 
     assert event.stacktrace.stackframes[0].filename.endswith(".py")
@@ -195,15 +205,17 @@ def test_logged_exc_event_stacktrace_frames_as_expected(store, process, exc):
 
 
 def test_logged_exc_event_has_no_stacktrace_if_requested(store, process, exc):
-    event = store.insert_event(process, exc=exc, inc_st=False)
+    event = store.insert_event(process, exc=exc, inc_st=False, sync=True)
     assert event.stacktrace is None
 
 
 def test_get_events_by_data_one_term_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")))
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")))
-    event3 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")))
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")))
+    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event3 = store.insert_event(
+        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+    )
+    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
 
     assert set([e.id for e in store.get_events_by_data((("foo", "foo1"),))]) == set([event1.id])
     assert set([e.id for e in store.get_events_by_data((("foo", "foo2"),))]) == set([event2.id, event3.id])
@@ -212,10 +224,12 @@ def test_get_events_by_data_one_term_returns_indicated_events(store, process):
 
 
 def test_get_events_by_data_two_terms_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")))
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")))
-    event3 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")))
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")))
+    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event3 = store.insert_event(
+        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+    )
+    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
 
     result_set = set([e.id for e in store.get_events_by_data((("foo", "foo1"), ("bar", "bar2")))])
     expected_set = set()
@@ -231,10 +245,12 @@ def test_get_events_by_data_two_terms_returns_indicated_events(store, process):
 
 
 def test_get_events_by_data_three_terms_two_unique_keys_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")))
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")))
-    event3 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")))
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")))
+    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event3 = store.insert_event(
+        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+    )
+    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
 
     result_set = set([e.id for e in store.get_events_by_data((("foo", "foo2"), ("baz", "baz1"), ("baz", "baz2")))])
     expected_set = set([event3.id])
@@ -242,13 +258,13 @@ def test_get_events_by_data_three_terms_two_unique_keys_returns_indicated_events
 
 
 def test_get_events_by_data_returns_events_with_stacktraces(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, discard=False)
+    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, sync=True)
 
     assert isinstance(store.get_events_by_data((("foo", "foo1"),))[0].stacktrace, store.Stacktrace)
 
 
 def test_get_events_by_data_returns_events_with_stacktraces_with_stackframes(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, discard=False)
+    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, sync=True)
     sf1 = store.get_events_by_data((("foo", "foo1"),))[0].stacktrace.stackframes[0]
 
     assert isinstance(sf1.filename, str)

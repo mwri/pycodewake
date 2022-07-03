@@ -34,6 +34,10 @@ the event. Stack traces may also be recorded for non exception events as well, e
 by specifying `inc_st=True`, or by changing the configuration such that non exception
 events always have them.
 
+The event will be logged asynchronously by default if the store supports this, and
+thus `log` will return `None`. If you specify the kward `sync=True` then the event
+created will be returned.
+
 ## Configuration
 
 By default, if `/etc/code_wake.conf` exists, or `./etc/code_wake.conf`, then they will
@@ -106,7 +110,6 @@ cwproc = code_wake.Process(
     store=Sql14Store("sqlite:////tmp/some_file.sqlite"),
 )
 ```
-
 
 Also `st_for_non_exceptions` will override the recording of stack traces for non exception
 events and `st_from_exceptions` for exception events.
