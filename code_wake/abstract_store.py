@@ -39,6 +39,7 @@ class AbstractStore:
         inc_st: Optional[bool] = None,
         st_len: Optional[int] = None,
         st_data: Optional[List[Tuple[str, int, str]]] = None,
+        when_ts: Optional[float] = None,
         sync: Optional[bool] = None,
     ) -> Optional[AbstractStore.Event]:
         raise Exception("unimplemented")

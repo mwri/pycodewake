@@ -132,6 +132,7 @@ class Process(NoStore.Process, metaclass=Singleton):
         exc: Optional[Exception] = None,
         inc_st: Optional[bool] = None,
         st_len: Optional[int] = None,
+        when_ts: Optional[float] = None,
         sync: Optional[bool] = False,
     ) -> Optional[AbstractStore.Event]:
         if not self._async_setup:

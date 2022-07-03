@@ -10,6 +10,8 @@ store_params - a two tuple (args and kwargs) providing the arguments for the sto
 """
 
 
+from datetime import datetime
+
 import pytest
 
 from code_wake import Process
@@ -97,6 +99,16 @@ def test_logged_event_has_logged_data(store, process):
     loaded_data = [{r.key: r.val} for r in event.data]
     assert {"foo1": "foo1bar"} in loaded_data
     assert {"bar2": "bar2baz"} in loaded_data
+
+
+def test_logged_event_has_current_event_time(store, process):
+    event = store.insert_event(process, sync=True)
+    assert datetime.now().timestamp() - event.when_ts < 10, (datetime.now().timestamp(), event.when_ts)
+
+
+def test_logged_event_has_given_event_time(store, process):
+    event = store.insert_event(process, sync=True, when_ts=123.456)
+    assert event.when_ts == 123.456, event.when_ts
 
 
 def test_logged_event_has_no_stacktrace_by_default(store, process):
