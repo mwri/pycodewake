@@ -36,7 +36,13 @@ coverage_args = (
 )
 mypy_args = (src_dir,)
 
-dev_deps = (*pkg_meta.install_requires, *pkg_meta.extras_require["dev"], "code-wake-sql14-store")
+dev_deps = (
+    *pkg_meta.install_requires,
+    *pkg_meta.extras_require["dev"],
+    "code-wake-sql14-store",
+    "code-wake-v1rest-store",
+    "code-wake-v1wsgi-service",
+)
 
 
 @nox.session(python=[default_pyvsn])
