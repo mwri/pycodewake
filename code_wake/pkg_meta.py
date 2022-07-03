@@ -38,7 +38,7 @@ extras_require = {
         "types-pyyaml==6.0.8",
         "sqlalchemy==1.4.39",
         "sqlalchemy-utils==0.38.2",
-        "requests==2.28.1",
+        "requests==2.28.0",
         "werkzeug==2.1.2",
         "flask==2.1.2",
     ],
