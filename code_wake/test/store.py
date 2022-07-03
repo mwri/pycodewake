@@ -239,3 +239,19 @@ def test_get_events_by_data_three_terms_two_unique_keys_returns_indicated_events
     result_set = set([e.id for e in store.get_events_by_data((("foo", "foo2"), ("baz", "baz1"), ("baz", "baz2")))])
     expected_set = set([event3.id])
     assert result_set == expected_set
+
+
+def test_get_events_by_data_returns_events_with_stacktraces(store, process):
+    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, discard=False)
+
+    assert isinstance(store.get_events_by_data((("foo", "foo1"),))[0].stacktrace, store.Stacktrace)
+
+
+def test_get_events_by_data_returns_events_with_stacktraces_with_stackframes(store, process):
+    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, discard=False)
+    sf1 = store.get_events_by_data((("foo", "foo1"),))[0].stacktrace.stackframes[0]
+
+    assert isinstance(sf1.filename, str)
+    assert sf1.filename.endswith(".py")
+    assert isinstance(sf1.lineno, int)
+    assert isinstance(sf1.src, str)
