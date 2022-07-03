@@ -30,6 +30,7 @@ install_requires = [
 extras_require = {
     "dev": [
         "pytest==7.0.1",
+        "pytest-timeout==2.1.0",
         "coverage==6.2",
         "black==22.3.0",
         "isort==5.10.1",

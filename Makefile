@@ -36,6 +36,7 @@ test: venv venv/lib/.dev_deps
 	. venv/bin/activate \
 		&& pytest \
 		-m "$(mark)" \
+		--timeout=10 \
 		$(pytest_args) \
 		$(tests)
 
@@ -47,6 +48,7 @@ coverage: venv venv/lib/.dev_deps
 			--source=$(src_dir) --omit="$(pkg_meta_src),$(pkg_test_src)" \
 			-m pytest \
 			-m "not soak" \
+			--timeout=10 \
 			$(pytest_args) \
 			$(tests) \
 		&& coverage report \
