@@ -24,6 +24,7 @@ test_pyvsns = ["3.6", "3.7", "3.8", "3.9", "3.10"]
 lintable_src = (src_dir, "test", "setup.py", "noxfile.py")
 black_args = ("--line-length", "120", *lintable_src)
 isort_args = ("--profile", "black", src_dir, *lintable_src)
+pytest_args = ("--timeout=10",)
 coverage_args = (
     "run",
     "--branch",
@@ -35,7 +36,13 @@ coverage_args = (
 )
 mypy_args = (src_dir,)
 
-dev_deps = (*pkg_meta.install_requires, *pkg_meta.extras_require["dev"], "code-wake-sql14-store")
+dev_deps = (
+    *pkg_meta.install_requires,
+    *pkg_meta.extras_require["dev"],
+    "code-wake-sql14-store",
+    "code-wake-v1rest-store",
+    "code-wake-v1wsgi-service",
+)
 
 
 @nox.session(python=[default_pyvsn])
@@ -50,7 +57,7 @@ def lint(session):
 def test(session):
     session.install(*dev_deps)
 
-    session.run("pytest")
+    session.run("pytest", *pytest_args)
 
 
 @nox.session(python=[default_pyvsn])

@@ -26,13 +26,13 @@ class Process(NoStore.Process, metaclass=Singleton):
 
     def __init__(
         self,
-        app_name: str = None,
-        app_vsn: str = None,
-        exe_path: str = None,
-        env_name: str = None,
-        st_for_non_exceptions: bool = None,
-        st_from_exceptions: bool = None,
-        store: AbstractStore = None,
+        app_name: Optional[str] = None,
+        app_vsn: Optional[str] = None,
+        exe_path: Optional[str] = None,
+        env_name: Optional[str] = None,
+        st_for_non_exceptions: Optional[bool] = None,
+        st_from_exceptions: Optional[bool] = None,
+        store: Optional[AbstractStore] = None,
     ):
         """
         Ideally you would call the constructor as soon as possible when the process begins. It
@@ -132,7 +132,9 @@ class Process(NoStore.Process, metaclass=Singleton):
         exc: Optional[Exception] = None,
         inc_st: Optional[bool] = None,
         st_len: Optional[int] = None,
-    ) -> AbstractStore.Event:
+        when_ts: Optional[float] = None,
+        sync: Optional[bool] = False,
+    ) -> Optional[AbstractStore.Event]:
         if not self._async_setup:
             self._async_init()
 
@@ -142,4 +144,4 @@ class Process(NoStore.Process, metaclass=Singleton):
             else:
                 inc_st = self._st_from_exceptions
 
-        return self._store.insert_event(self, data, exc, inc_st, st_len)
+        return self._store.insert_event(self, data, exc=exc, inc_st=inc_st, st_len=st_len, sync=sync)  # type: ignore

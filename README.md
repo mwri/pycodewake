@@ -34,6 +34,10 @@ the event. Stack traces may also be recorded for non exception events as well, e
 by specifying `inc_st=True`, or by changing the configuration such that non exception
 events always have them.
 
+The event will be logged asynchronously by default if the store supports this, and
+thus `log` will return `None`. If you specify the kward `sync=True` then the event
+created will be returned.
+
 ## Configuration
 
 By default, if `/etc/code_wake.conf` exists, or `./etc/code_wake.conf`, then they will
@@ -107,9 +111,31 @@ cwproc = code_wake.Process(
 )
 ```
 
-
 Also `st_for_non_exceptions` will override the recording of stack traces for non exception
 events and `st_from_exceptions` for exception events.
+
+## Queue store
+
+A "queue store" which can be mixed in with another store, can be used to turn any
+store into one which always queues, instead of immediately adding the event. This
+means that a process may be protected from being adversely affected by high latency
+or unreliable stores. The events are processed by another thread, which commits them
+to whatever actual storage you are using.
+
+For example:
+
+```python
+from code_wake import QueueStore
+from code_wake_sql14_store import Sql14Store
+
+class Sql14QueueStore(QueueStore, Sql14Store):
+    pass
+
+store = Sql14QueueStore("sqlite:////tmp/some_file.sqlite")
+```
+
+The store adapter used with the queue store must be thread safe and cross thread operable.
+Sqlite for example, does not work cross threads when used with memory backing!
 
 ## Environment variables
 

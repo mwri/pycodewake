@@ -28,7 +28,7 @@ dev_deps: venv/lib/.dev_deps
 venv/lib/.dev_deps: venv/lib/.deps venv/bin/activate $(pkg_meta_src)
 	. venv/bin/activate \
 		&& pip install $$(python3 $(pkg_meta_src) extras_require dev) \
-		&& pip install --no-deps code-wake-sql14-store
+		&& pip install --no-deps code-wake-sql14-store code-wake-v1rest-store code-wake-v1wsgi-service
 	touch venv/lib/.dev_deps
 
 .PHONY: test
@@ -36,6 +36,7 @@ test: venv venv/lib/.dev_deps
 	. venv/bin/activate \
 		&& pytest \
 		-m "$(mark)" \
+		--timeout=10 \
 		$(pytest_args) \
 		$(tests)
 
@@ -47,6 +48,7 @@ coverage: venv venv/lib/.dev_deps
 			--source=$(src_dir) --omit="$(pkg_meta_src),$(pkg_test_src)" \
 			-m pytest \
 			-m "not soak" \
+			--timeout=10 \
 			$(pytest_args) \
 			$(tests) \
 		&& coverage report \

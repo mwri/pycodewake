@@ -17,10 +17,11 @@ def clear():
 
 
 @pytest.fixture
-def store(clear, store_cls, store_params) -> AbstractStore:
+def store(clear, store_cls, store_params, store_cleanup) -> AbstractStore:
     (args, kwargs) = store_params() if callable(store_params) else store_params
     store = store_cls(*args, **kwargs)
-    return store
+    yield store
+    store_cleanup(store)
 
 
 @pytest.fixture

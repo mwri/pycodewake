@@ -30,6 +30,7 @@ install_requires = [
 extras_require = {
     "dev": [
         "pytest==7.0.1",
+        "pytest-timeout==2.1.0",
         "coverage==6.2",
         "black==22.3.0",
         "isort==5.10.1",
@@ -37,6 +38,9 @@ extras_require = {
         "types-pyyaml==6.0.8",
         "sqlalchemy==1.4.39",
         "sqlalchemy-utils==0.38.2",
+        "requests==2.28.0",
+        "werkzeug==2.1.2",
+        "flask==2.1.2",
     ],
 }
 

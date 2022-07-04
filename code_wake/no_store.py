@@ -5,24 +5,26 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .abstract_store import AbstractStore
+
 if TYPE_CHECKING:
     from .process import Process
 
 
-class NoStore:
+class NoStore(AbstractStore):
     """
     Used in place of a store by a current/running process object until it commits to a real store.
 
     Maintains minimal API compatibility layer with real stores and store provided process objects.
     """
 
-    def get_process_by_id(self, id: int):
+    def get_process_by_id(self, *_args, **_kwargs):
         raise Exception("unimplemented")
 
-    def insert_process(self, unstored_process: Process):
+    def insert_process(self, *_args, **_kwargs):
         raise Exception("unimplemented")
 
-    def insert_event(self):
+    def insert_event(self, *_args, **_kwargs):
         raise Exception("unimplemented")
 
     class Process:
