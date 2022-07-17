@@ -284,3 +284,31 @@ def test_get_events_by_data_returns_events_with_stacktraces_with_stackframes(sto
     assert sf1.filename.endswith(".py")
     assert isinstance(sf1.lineno, int)
     assert isinstance(sf1.src, str)
+
+
+def test_get_processes_by_run_time(store):
+    from_ts = datetime.now().timestamp()
+    process = Process(store=store).init()
+    to_ts = datetime.now().timestamp()
+
+    process_ids = [process.id for process in store.get_processes(from_ts=from_ts, to_ts=to_ts)]
+    assert process_ids == [process.id], process_ids
+    process_ids = [process.id for process in store.get_processes(0, from_ts)]
+    assert process_ids == [], process_ids
+    process_ids = [process.id for process in store.get_processes(to_ts, to_ts + 1000000)]
+    assert process_ids == [], process_ids
+
+
+def test_get_processes_by_app_id(store):
+    from_ts = datetime.now().timestamp()
+    process = Process(store=store).init()
+    to_ts = datetime.now().timestamp()
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id, from_ts=from_ts, to_ts=to_ts)]
+    assert process_ids == [process.id], process_ids
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id)]
+    assert process.id in process_ids
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id + 1000000)]
+    assert process_ids == [], process_ids
