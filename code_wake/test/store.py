@@ -13,7 +13,6 @@ store_params - a two tuple (args and kwargs) providing the arguments for the sto
 from datetime import datetime
 
 import pytest
-
 from code_wake import Process
 
 
@@ -224,64 +223,92 @@ def test_logged_exc_event_has_no_stacktrace_if_requested(store, process, exc):
 
 
 def test_get_events_by_data_one_term_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event1 = store.insert_event(process, (("foo1", "foo1"), ("bar1", "bar1"), ("baz1", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo1", "foo2"), ("bar1", "bar1"), ("baz1", "baz1")), sync=True)
     event3 = store.insert_event(
-        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+        process, (("foo1", "foo2"), ("bar1", "bar2"), ("baz1", "baz1"), ("baz1", "baz2")), sync=True
     )
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event4 = store.insert_event(process, (("foo1", "foo3"), ("bar1", "bar1"), ("baz1", "baz1")), sync=True)
 
-    assert set([e.id for e in store.get_events_by_data((("foo", "foo1"),))]) == set([event1.id])
-    assert set([e.id for e in store.get_events_by_data((("foo", "foo2"),))]) == set([event2.id, event3.id])
-    assert set([e.id for e in store.get_events_by_data((("foo", "foo4"),))]) == set()
-    assert set([e.id for e in store.get_events_by_data((("baz", "foo4"),))]) == set()
+    assert set([e.id for e in store.get_events_by_data((("foo1", "foo1"),))]) == set([event1.id])
+    assert set([e.id for e in store.get_events_by_data((("foo1", "foo2"),))]) == set([event2.id, event3.id])
+    assert set([e.id for e in store.get_events_by_data((("foo1", "foo4"),))]) == set()
+    assert set([e.id for e in store.get_events_by_data((("baz1", "foo4"),))]) == set()
 
 
 def test_get_events_by_data_two_terms_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event1 = store.insert_event(process, (("foo2", "foo1"), ("bar2", "bar1"), ("baz2", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo2", "foo2"), ("bar2", "bar1"), ("baz2", "baz1")), sync=True)
     event3 = store.insert_event(
-        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+        process, (("foo2", "foo2"), ("bar2", "bar2"), ("baz2", "baz1"), ("baz2", "baz2")), sync=True
     )
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event4 = store.insert_event(process, (("foo2", "foo3"), ("bar2", "bar1"), ("baz2", "baz1")), sync=True)
 
-    result_set = set([e.id for e in store.get_events_by_data((("foo", "foo1"), ("bar", "bar2")))])
+    result_set = set([e.id for e in store.get_events_by_data((("foo2", "foo1"), ("bar2", "bar2")))])
     expected_set = set()
     assert result_set == expected_set
 
-    result_set = set([e.id for e in store.get_events_by_data((("foo", "foo2"), ("bar", "bar2")))])
+    result_set = set([e.id for e in store.get_events_by_data((("foo2", "foo2"), ("bar2", "bar2")))])
     expected_set = set([event3.id])
     assert result_set == expected_set
 
-    result_set = set([e.id for e in store.get_events_by_data((("foo", "foo2"), ("baz", "baz1")))])
+    result_set = set([e.id for e in store.get_events_by_data((("foo2", "foo2"), ("baz2", "baz1")))])
     expected_set = set([event2.id, event3.id])
     assert result_set == expected_set
 
 
 def test_get_events_by_data_three_terms_two_unique_keys_returns_indicated_events(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
-    event2 = store.insert_event(process, (("foo", "foo2"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event1 = store.insert_event(process, (("foo3", "foo1"), ("bar3", "bar1"), ("baz3", "baz1")), sync=True)
+    event2 = store.insert_event(process, (("foo3", "foo2"), ("bar3", "bar1"), ("baz3", "baz1")), sync=True)
     event3 = store.insert_event(
-        process, (("foo", "foo2"), ("bar", "bar2"), ("baz", "baz1"), ("baz", "baz2")), sync=True
+        process, (("foo3", "foo2"), ("bar3", "bar2"), ("baz3", "baz1"), ("baz3", "baz2")), sync=True
     )
-    event4 = store.insert_event(process, (("foo", "foo3"), ("bar", "bar1"), ("baz", "baz1")), sync=True)
+    event4 = store.insert_event(process, (("foo3", "foo3"), ("bar3", "bar1"), ("baz3", "baz1")), sync=True)
 
-    result_set = set([e.id for e in store.get_events_by_data((("foo", "foo2"), ("baz", "baz1"), ("baz", "baz2")))])
+    result_set = set([e.id for e in store.get_events_by_data((("foo3", "foo2"), ("baz3", "baz1"), ("baz3", "baz2")))])
     expected_set = set([event3.id])
     assert result_set == expected_set
 
 
 def test_get_events_by_data_returns_events_with_stacktraces(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, sync=True)
+    event1 = store.insert_event(process, (("foo4", "foo1"),), inc_st=True, sync=True)
 
-    assert isinstance(store.get_events_by_data((("foo", "foo1"),))[0].stacktrace, store.Stacktrace)
+    assert isinstance(store.get_events_by_data((("foo4", "foo1"),))[0].stacktrace, store.Stacktrace)
 
 
 def test_get_events_by_data_returns_events_with_stacktraces_with_stackframes(store, process):
-    event1 = store.insert_event(process, (("foo", "foo1"),), inc_st=True, sync=True)
-    sf1 = store.get_events_by_data((("foo", "foo1"),))[0].stacktrace.stackframes[0]
+    event1 = store.insert_event(process, (("foo4", "foo1"),), inc_st=True, sync=True)
+    sf1 = store.get_events_by_data((("foo4", "foo1"),))[0].stacktrace.stackframes[0]
 
     assert isinstance(sf1.filename, str)
     assert sf1.filename.endswith(".py")
     assert isinstance(sf1.lineno, int)
     assert isinstance(sf1.src, str)
+
+
+def test_get_processes_by_run_time(store):
+    from_ts = datetime.now().timestamp()
+    process = Process(store=store).init()
+    to_ts = datetime.now().timestamp()
+
+    process_ids = [process.id for process in store.get_processes(from_ts=from_ts, to_ts=to_ts)]
+    assert process_ids == [process.id], process_ids
+    process_ids = [process.id for process in store.get_processes(0, from_ts)]
+    assert process_ids == [], process_ids
+    process_ids = [process.id for process in store.get_processes(to_ts, to_ts + 1000000)]
+    assert process_ids == [], process_ids
+
+
+def test_get_processes_by_app_id(store):
+    from_ts = datetime.now().timestamp()
+    process = Process(store=store).init()
+    to_ts = datetime.now().timestamp()
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id, from_ts=from_ts, to_ts=to_ts)]
+    assert process_ids == [process.id], process_ids
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id)]
+    assert process.id in process_ids
+
+    process_ids = [process.id for process in store.get_processes(app_id=process.app.id + 1000000)]
+    assert process_ids == [], process_ids
