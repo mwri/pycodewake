@@ -4,7 +4,7 @@ import sys
 from typing import Any, Dict
 
 name = "code-wake"
-version = "0.2.0"
+version = "0.2.1"
 author = "Michael Wright"
 author_email = "mjw@methodanalysis.com"
 description = "Running code use instrumentation aid"
