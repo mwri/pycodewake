@@ -41,6 +41,7 @@ extras_require = {
         "requests==2.28.0",
         "werkzeug==2.1.2",
         "flask==2.1.2",
+        "requests-flask-adapter==0.1.0",
     ],
 }
 

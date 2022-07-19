@@ -12,6 +12,7 @@ import sqlalchemy as sa
 from code_wake_sql14_store import Sql14Store
 from code_wake_v1rest_store import V1RestStore
 from code_wake_v1wsgi_service import V1WsgiMiddleware
+from requests_flask_adapter import Session
 
 from code_wake import Process, QueueStore
 from code_wake.test.conftest import *
@@ -19,27 +20,21 @@ from code_wake.test.conftest import *
 
 def v1rest_store_params():
     flask_app = flask.Flask(__name__)
-    flask_app.wsgi_app = V1WsgiMiddleware(flask_app.wsgi_app, "/abc", Sql14Store("sqlite:///:memory:"))
+    flask_app.wsgi_app = V1WsgiMiddleware(flask_app.wsgi_app, "", Sql14Store("sqlite:///:memory:"))
 
-    return (["/abc"], {"flask_app": flask_app})
+    Session.register("http://", flask_app)
+
+    return (["http://abc"], {"session": Session()})
 
 
 class TestV1RestStore(V1RestStore):
-    def __init__(self, *args, flask_app, **kwargs):
+    def __init__(self, *args, session, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._flask_app = flask_app
-        flask_app.test_client_class = self.FlaskClient
+        self._session = session
 
-    class FlaskClient(flask.testing.FlaskClient):
-        def open(self, *args, **kwargs):
-            headers = kwargs.setdefault("headers", {})
-            headers.setdefault("content-type", "application/json")
-            return super().open(*args, **kwargs)
-
-    @property
     def session(self):
-        return self._flask_app.test_client
+        return self._session
 
 
 class TestSql14QueueStore(QueueStore, Sql14Store):
